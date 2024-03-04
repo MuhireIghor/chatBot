@@ -1,8 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const dotenv = require("dotenv")
-const {Client} = require("whatsapp-web.js")
+const {Client} = require("whatsapp-web.js");
+const { connectDb } = require('./utils/db.config');
 dotenv.config()
 
 const client = new Client()
@@ -12,15 +13,8 @@ const port = 3000;
 let isFirstMessage = true; // Flag to track the first message
 
 // Connect to database 
-mongoose.connect(`mongodb+srv://devighor:${process.env.DB_PASSWORD}@whatsappchatbot.1c5dng5.mongodb.net/whatsappChatbot`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 
-const db = mongoose.connection;
-db.on('error', ()=>console.log('MongoDB connection error:'))
-db.once('open', () => console.log('Connected to MongoDB database'));
-
+connectDb()
 // CORS configuration 
 app.use(cors({ origin: '*' })); 
 
@@ -56,10 +50,11 @@ app.post('/qr-code', async (req, res) => {
     res.status(500).json({ message: 'Error processing QR code data' });
   }
 });
-client.on("qr",(qr)=>{
-  console.log(`qr code received ${qr}`)
-})
+// client.on("qr",(qr)=>{
+//   console.log(`qr code received ${qr}`)
+// })
 client.on("message",(message)=>{
+  console.log(message,from,message.body)
   const content = message.body;
   if (content.toLowerCase() === 'hi') {
     client.sendMessage(message.from,"How are u doing")
