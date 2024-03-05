@@ -45,7 +45,7 @@ app.post("/webhook", async (req, res) => {
                         to: from,
                         type: "interactive",
                         interactive: {
-                            type: "list",
+                            type: "button",
 
                             body: {
 
@@ -53,10 +53,22 @@ app.post("/webhook", async (req, res) => {
                             },
                             action: {
 
-                           name:"test",
-                           parameters:{
-                            country:"in"
-                           }
+                                buttons: [
+                                    {
+                                        type: "reply",
+                                        reply: {
+                                            id: "address_form",
+                                            title: "Fill Address",
+                                        },
+                                    },
+                                    {
+                                        type: "reply",
+                                        reply: {
+                                            id: "location",
+                                            title: "Send Location",
+                                        },
+                                    },
+                                ],
                             },
 
                         }
