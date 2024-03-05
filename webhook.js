@@ -27,7 +27,7 @@ app.post("/webhook", async (req, res) => {
             req.body.entry[0].changes[0].value.messages &&
             req.body.entry[0].changes[0].value.messages[0]
         ) {
-            let phone_number_id =req.body.entry[0].changes[0].value.metadata.phone_number_id;
+            let phone_number_id = req.body.entry[0].changes[0].value.metadata.phone_number_id;
             let from = req.body.entry[0].changes[0].value.messages[0].from;
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
 
@@ -42,7 +42,54 @@ app.post("/webhook", async (req, res) => {
                     data: {
                         messaging_product: "whatsapp",
                         to: from,
-                        text: { body: "How can I help you" },
+                        type: "interactive",
+                        interactive: {
+                            type: "list",
+
+                            body: {
+
+                                text: "How can I help you"
+                            },
+                            action: {
+                                button: "Choose a City",
+                                sections: [
+                                    {
+                                        title: "Choose a City",
+                                        rows: [
+                                            {
+                                                id: `city_hyderabad`,
+                                                title: "Hyderabad",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_delhi`,
+                                                title: "Delhi",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_mumbai`,
+                                                title: "Mumbai",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_banglore`,
+                                                title: "Banglore",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_vizag`,
+                                                title: "Vizag",
+                                                //   description: "row-description-content-here",
+                                            },
+                                        ],
+                                    },
+
+                                    // },
+                                ],
+                            },
+
+                        }
+                        ,
                     },
                     headers: { "Content-Type": "application/json" },
                 });
@@ -239,7 +286,7 @@ const sendCityInteractiveMessage = async (
             data: data,
         };
         const response = await axios.request(config);
-        console.log("results on the operation",response);
+        console.log("results on the operation", response);
     } catch (err) {
         console.log(err);
     }
