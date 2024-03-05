@@ -103,7 +103,7 @@ app.post("/webhook", (req, res) => {
                         phone_number_id +
                         "/messages?access_token=" +
                         token,
-                    data:data,
+                    data:msg_body.toString(),
                     headers: { "Content-Type": "application/json" },
                 });
             }
