@@ -23,7 +23,7 @@ const request = require("request"),
 app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
 
 // Accepts POST requests at /webhook endpoint
-app.post("/webhook", (req, res) => {
+app.post("/webhook", async (req, res) => {
     // Parse the request body from the POST
     let body = req.body;
 
@@ -42,71 +42,87 @@ app.post("/webhook", (req, res) => {
             let phone_number_id =
                 req.body.entry[0].changes[0].value.metadata.phone_number_id;
             let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
-            let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body;
-            const data = JSON.stringify({
-                messaging_product: "whatsapp",
-                to: from,
-                type: "interactive",
-                interactive: {
-                    type: "list",
-                    body: {
-                        text: "Please select a category From the below Options",
-                    },
-                    action: {
-                        button: "Select Category",
-                        sections: [
-                            {
-                                title: "Choose a Category",
-                                rows: [
-                                    {
-                                        id: `cat_chains`,
-                                        title: "Chain",
-                                    },
-                                    {
-                                        id: `cat_necklace`,
-                                        title: "necklace",
-                                    },
-                                    {
-                                        id: `cat_bangles`,
-                                        title: "Bangles",
-                                    },
-                                    {
-                                        id: `cat_silver`,
-                                        title: "Silver Items",
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                },
-            }); // extract the message text from the webhook payload
-            if (msg_body.toString().toLowerCase() == 'hello' || 'hi') {
-
-             
-                axios({
-                    method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-                    url:
-                        "https://graph.facebook.com/v12.0/" +
-                        phone_number_id +
-                        "/messages?access_token=" +
-                        token,
-                    data: data,
-                    headers: { "Content-Type": "application/json" },
-                });
+            let msg_body = req.body.entry[0].changes[0].value.messages[0]
+            if (msg_body.type === 'text') {
+                await sendCityInteractiveMessage(phone_number_id, token, from)
+                const responseBody = "Done";
+                response = {
+                    statusCode: 200,
+                    body: JSON.stringify(responseBody),
+                    isBase64Encoded: false,
+                };
             }
-            else {
-
-                axios({
-                    method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-                    url:
-                        "https://graph.facebook.com/v12.0/" +
-                        phone_number_id +
-                        "/messages?access_token=" +
-                        token,
-                    data:data,
-                    headers: { "Content-Type": "application/json" },
-                });
+            else if (msg_body.type === "interactive") {
+                if (msg_body.interactive.type === 'list_reply') {
+                    let messageinfo =
+                        message.interactive.list_reply.id.split("_");
+                    if (messageinfo[0] === "city") {
+                        await sendCategoryInteractiveMessage(
+                            phone_number_id,
+                            token,
+                            from,
+                            messageinfo[1]
+                        );
+                    } else if (messageinfo[0] === "cat") {
+                        await sendReply(
+                            phone_number_id,
+                            token,
+                            from,
+                            `${messageinfo[2]} and ${messageinfo[3]}`
+                        );
+                    }
+                    const responseBody = "Done";
+                    response = {
+                        statusCode: 200,
+                        body: JSON.stringify(responseBody),
+                        isBase64Encoded: false,
+                    }
+                }
             }
+            else if (msg_body.type === "button_reply") {
+                let messageinfo = message.interactive.button_reply.id;
+                if (messageinfo === "address_form") {
+                    await sendAddressDeliveryMessage(
+                        phone_number_id,
+                        token,
+                        from
+                    );
+                } else if (messageinfo === "location") {
+                    await sendLocationMessage(
+                        phone_number_id,
+                        token,
+                        from
+                    );
+                }
+            }
+
+            // if (msg_body.toString().toLowerCase() == 'hello' || 'hi') {
+
+
+            //     axios({
+            //         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+            //         url:
+            //             "https://graph.facebook.com/v12.0/" +
+            //             phone_number_id +
+            //             "/messages?access_token=" +
+            //             token,
+            //         data: data,
+            //         headers: { "Content-Type": "application/json" },
+            //     });
+            // }
+            // else {
+
+            //     axios({
+            //         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+            //         url:
+            //             "https://graph.facebook.com/v12.0/" +
+            //             phone_number_id +
+            //             "/messages?access_token=" +
+            //             token,
+            //         data: data,
+            //         headers: { "Content-Type": "application/json" },
+            //     });
+            // }
         }
         res.sendStatus(200);
     } else {
