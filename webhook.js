@@ -55,7 +55,7 @@ app.post("/webhook", async (req, res) => {
             else if (msg_body.type === "interactive" && isCitySelected) {
                 if (msg_body.interactive.type === 'list_reply') {
                     let messageinfo =
-                        message.interactive.list_reply.id.split("_");
+                        msg_body.interactive.list_reply.id.split("_");
                     if (messageinfo[0] === "city") {
                         await sendCategoryInteractiveMessage(
                             phone_number_id,
@@ -80,7 +80,7 @@ app.post("/webhook", async (req, res) => {
                 }
             }
             else if (msg_body.type === "button_reply") {
-                let messageinfo = message.interactive.button_reply.id;
+                let messageinfo = msg_body.interactive.button_reply.id;
                 if (messageinfo === "address_form") {
                     await sendAddressDeliveryMessage(
                         phone_number_id,
@@ -191,27 +191,27 @@ const sendCityInteractiveMessage = async (
                             title: "Choose a City",
                             rows: [
                                 {
-                                    id: `city_${city}_hyderabad`,
+                                    id: `city_hyderabad`,
                                     title: "Hyderabad",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: `city_${city}_delhi`,
+                                    id: `city_delhi`,
                                     title: "Delhi",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: `city_${city}mumbai`,
+                                    id: `city_mumbai`,
                                     title: "Mumbai",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: `city_${city}_banglore`,
+                                    id: `city_banglore`,
                                     title: "Banglore",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: `city_${city}_vizag`,
+                                    id: `city_vizag`,
                                     title: "Vizag",
                                     //   description: "row-description-content-here",
                                 },
@@ -227,7 +227,7 @@ const sendCityInteractiveMessage = async (
         let config = {
             method: "post",
             maxBodyLength: Infinity,
-            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            url: `https://graph.facebook.com/v12.0/${phone_number_id}/messages`,
             headers: {
                 Authorization: `Bearer ${whatsapp_token}`,
                 "Content-Type": "application/json",
@@ -235,7 +235,7 @@ const sendCityInteractiveMessage = async (
             data: data,
         };
         const response = await axios.request(config);
-        console.log(response);
+        console.log("results on the operation",response);
     } catch (err) {
         console.log(err);
     }
