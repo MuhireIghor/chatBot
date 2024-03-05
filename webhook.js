@@ -6,7 +6,7 @@
  */
 
 "use strict";
-
+// req.body.entry[0].changes[0]
 // Access token for your app
 // (copy token from DevX getting started page
 // and save it as environment variable into the .env file)
@@ -44,6 +44,23 @@ app.post("/webhook", (req, res) => {
             let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
             let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
             if (msg_body.toString().toLowerCase() == 'hello' || 'hi') {
+                const buttons = [
+                    {
+                        title: "Get Started",
+                        type: "postback",
+                        payload: "START",
+                    },
+                    {
+                        title: "Learn More",
+                        type: "web_url",
+                        url: "https://igihe.com"
+                        
+                    },
+                ];
+                const quickReplies = {
+                    text: "Hi there! How can I help you?",
+                    quick_replies: buttons,
+                };
 
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
@@ -55,7 +72,7 @@ app.post("/webhook", (req, res) => {
                     data: {
                         messaging_product: "whatsapp",
                         to: from,
-                        text: { body: "How can I help you" },
+                        text: { body: quickReplies },
                     },
                     headers: { "Content-Type": "application/json" },
                 });
@@ -111,3 +128,366 @@ app.get("/webhook", (req, res) => {
         }
     }
 });
+
+
+const sendReply = async (
+    phone_number_id,
+    whatsapp_token,
+    to,
+    reply_message
+) => {
+    try {
+        console.log(phone_number_id, to, reply_message);
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            to: to,
+            type: "text",
+            text: {
+                body: `Thank you for checking the bot Your City & Cat are ${reply_message}`
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+
+const sendCityInteractiveMessage = async (
+    phone_number_id,
+    whatsapp_token,
+    to
+) => {
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "list",
+                body: {
+                    text: "Welcome to Ecommerce Bot, Please select  from the options",
+                },
+                action: {
+                    button: "Choose a City",
+                    sections: [
+                        {
+                            title: "Choose a City",
+                            rows: [
+                                {
+                                    id: "city_hyderabad",
+                                    title: "Hyderabad",
+                                    //   description: "row-description-content-here",
+                                },
+                                {
+                                    id: "city_delhi",
+                                    title: "Delhi",
+                                    //   description: "row-description-content-here",
+                                },
+                                {
+                                    id: "city_mumbai",
+                                    title: "Mumbai",
+                                    //   description: "row-description-content-here",
+                                },
+                                {
+                                    id: "city_banglore",
+                                    title: "Banglore",
+                                    //   description: "row-description-content-here",
+                                },
+                                {
+                                    id: "city_vizag",
+                                    title: "Vizag",
+                                    //   description: "row-description-content-here",
+                                },
+                            ],
+                        },
+                        // {
+                        //   title: "your-section-title-content-here",
+                        //   rows: [
+                        //     {
+                        //       id: "unique-row-identifier-here",
+                        //       title: "row-title-content-here",
+                        //       description: "row-description-content-here",
+                        //     },
+                        //   ],
+                        // },
+                    ],
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const sendCategoryInteractiveMessage = async (
+    phone_number_id,
+    whatsapp_token,
+    to,
+    city
+) => {
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "list",
+                body: {
+                    text: "Please select a category From the below Options",
+                },
+                action: {
+                    button: "Select Category",
+                    sections: [
+                        {
+                            title: "Choose a Category",
+                            rows: [
+                                {
+                                    id: `cat_${city}_chains`,
+                                    title: "Chain",
+                                },
+                                {
+                                    id: `cat_${city}_necklace`,
+                                    title: "necklace",
+                                },
+                                {
+                                    id: `cat_${city}_bangles`,
+                                    title: "Bangles",
+                                },
+                                {
+                                    id: `cat_${city}_silver`,
+                                    title: "Silver Items",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(err);
+    }
+};
+const sendMultipleProductMessage = async (
+    phone_number_id,
+    whatsapp_token,
+    to,
+    category
+) => {
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "product_list",
+                header: {
+                    type: "text",
+                    text: `Jewellery Store ${category}`,
+                },
+                body: {
+                    text: "We are dedicated to providing our customers with the safest and cleanest products, Please select products from below",
+                },
+                action: {
+                    catalog_id: "176713595394228",
+                    sections: [
+                        {
+                            title: "Jewellery Products",
+                            product_items: [
+                                {
+                                    product_retailer_id: "tc5k2e4gfa",
+                                },
+                                {
+                                    product_retailer_id: "wkey35bg0x",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(JSON.stringify(err));
+    }
+};
+
+const sendAddressDeliveryMessage = async (
+    phone_number_id,
+    whatsapp_token,
+    to
+) => {
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "address_message",
+                body: {
+                    text: "Thanks for your order! Tell us what address you'd like this order delivered to.",
+                },
+                action: {
+                    name: "address_message",
+                    parameters: {
+                        country: "IN",
+                    },
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(JSON.stringify(err));
+    }
+};
+
+const sendLocationMessage = async (phone_number_id, whatsapp_token, to) => {
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "location_request_message",
+                body: {
+                    type: "text",
+                    text: "Please Send Your Current Location For Address",
+                },
+                action: {
+                    name: "send_location",
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(JSON.stringify(err));
+    }
+};
+const sendReplyButtons = async (phone_number_id, whatsapp_token, to) => {
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "button",
+                body: {
+                    text: "Please select an option for sending the delivery",
+                },
+                action: {
+                    buttons: [
+                        {
+                            type: "reply",
+                            reply: {
+                                id: "address_form",
+                                title: "Fill Address",
+                            },
+                        },
+                        {
+                            type: "reply",
+                            reply: {
+                                id: "location",
+                                title: "Send Location",
+                            },
+                        },
+                    ],
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
+    } catch (err) {
+        console.log(JSON.stringify(err));
+    }
+};
+
+
+
