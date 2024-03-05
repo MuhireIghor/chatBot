@@ -52,6 +52,7 @@ app.post("/webhook", async (req, res) => {
                                 text: "How can I help you"
                             },
                             action: {
+
                                 button: "Choose a City",
                                 sections: [
                                     {
@@ -60,6 +61,36 @@ app.post("/webhook", async (req, res) => {
                                             {
                                                 id: `city_hyderabad`,
                                                 title: "Hyderabad",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_delhi`,
+                                                title: "Delhi",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_mumbai`,
+                                                title: "Mumbai",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_banglore`,
+                                                title: "Banglore",
+                                                //   description: "row-description-content-here",
+                                            },
+                                            {
+                                                id: `city_vizag`,
+                                                title: "Vizag",
+                                                //   description: "row-description-content-here",
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        title: "Choose a Region",
+                                        rows: [
+                                            {
+                                                id: `city_hwyderabad`,
+                                                title: "Hyderabawd",
                                                 //   description: "row-description-content-here",
                                             },
                                             {
