@@ -40,6 +40,7 @@ app.post("/webhook", async (req, res) => {
                         "/messages?access_token=" +
                         token,
                     data: {
+
                         messaging_product: "whatsapp",
                         to: from,
                         type: "interactive",
@@ -47,7 +48,7 @@ app.post("/webhook", async (req, res) => {
                             type: "list",
 
                             body: {
-                                title: "Our dashboard",
+
                                 text: "How can I help you"
                             },
                             action: {
