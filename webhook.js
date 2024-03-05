@@ -47,7 +47,7 @@ app.post("/webhook", async (req, res) => {
                             type: "list",
 
                             body: {
-
+                                title: "Our dashboard",
                                 text: "How can I help you"
                             },
                             action: {
