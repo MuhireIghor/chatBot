@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon webhook.js",
-    "dev": "nodemon --inspect script.js"
+    "start": "nodemon webhook.js"
   },
   "keywords": [],
   "author": "",
