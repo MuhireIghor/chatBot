@@ -39,7 +39,11 @@ app.post("/webhook", async (req, res) => {
                         phone_number_id +
                         "/messages?access_token=" +
                         token,
-                    data: 'Hello welcome to our bot',
+                    data: {
+                        messaging_product: "whatsapp",
+                        to: from,
+                        text: { body: "How can I help you" },
+                    },
                     headers: { "Content-Type": "application/json" },
                 });
             }
