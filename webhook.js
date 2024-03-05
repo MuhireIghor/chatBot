@@ -27,12 +27,11 @@ app.post("/webhook", async (req, res) => {
             req.body.entry[0].changes[0].value.messages &&
             req.body.entry[0].changes[0].value.messages[0]
         ) {
-            let phone_number_id =
-                req.body.entry[0].changes[0].value.metadata.phone_number_id;
-            let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
+            let phone_number_id =req.body.entry[0].changes[0].value.metadata.phone_number_id;
+            let from = req.body.entry[0].changes[0].value.messages[0].from;
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
 
-            if (msg_body.text.body.toString().toLowerCAse() == 'hello' || 'hi') {
+            if (msg_body.text.body.toString().toLowerCase() == 'hello' || 'hi') {
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
                     url:
@@ -40,7 +39,7 @@ app.post("/webhook", async (req, res) => {
                         phone_number_id +
                         "/messages?access_token=" +
                         token,
-                    data: msg_body.text.body.toString(),
+                    data: 'Hello welcome to our bot',
                     headers: { "Content-Type": "application/json" },
                 });
             }
