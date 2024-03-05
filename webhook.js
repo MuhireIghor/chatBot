@@ -94,6 +94,11 @@ app.post("/webhook", async (req, res) => {
                         from
                     );
                 }
+                else if (message.type === "order") {
+                    await sendReplyButtons(phone_number_id, token, from);
+                    // for (const item of message.order.product_items) {
+                    // }
+                  }
             }
 
             // if (msg_body.toString().toLowerCase() == 'hello' || 'hi') {
