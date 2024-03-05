@@ -3,26 +3,22 @@
 
 const token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
 let isCitySelected = false;
-let selectedCity=''
+let selectedCity = ''
 
-const request = require("request"),
-    express = require("express"),
-    body_parser = require("body-parser"),
-    axios = require("axios").default,
-    app = express().use(body_parser.json()); // creates express http server
+const request = require("request");
+const express = require("express");
+const body_parser = require("body-parser");
+const axios = require("axios").default;
+const app = express().use(body_parser.json());
 
-// Sets server port and logs message on success
+
 app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
 
-// Accepts POST requests at /webhook endpoint
 app.post("/webhook", async (req, res) => {
-    // Parse the request body from the POST
-    let body = req.body;
 
-    // Check the Incoming webhook message
     console.log(JSON.stringify(req.body, null, 2));
 
-    // info on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
+
     if (req.body.object) {
         if (
             req.body.entry &&
@@ -36,7 +32,7 @@ app.post("/webhook", async (req, res) => {
             let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
 
-            if (msg_body.text.body.toString() == 'Hello' || 'Hi') {
+            if (msg_body.text.body.toString().toLowerCAse() == 'hello' || 'hi') {
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
                     url:
@@ -48,7 +44,7 @@ app.post("/webhook", async (req, res) => {
                     headers: { "Content-Type": "application/json" },
                 });
             }
-            else if (msg_body.type === 'text'&& isCitySelected == false) {
+            else if (msg_body.type === 'text' && isCitySelected == false) {
                 await sendCityInteractiveMessage(phone_number_id, token, from)
                 const responseBody = "Done";
                 response = {
@@ -101,15 +97,14 @@ app.post("/webhook", async (req, res) => {
                 }
                 else if (message.type === "order") {
                     await sendReplyButtons(phone_number_id, token, from);
-                    // for (const item of message.order.product_items) {
-                    // }
+
                 }
             }
 
         }
         res.sendStatus(200);
     } else {
-        // Return a '404 Not Found' if event is not from a WhatsApp API
+
         res.sendStatus(404);
     }
 });
@@ -119,20 +114,20 @@ app.get("/webhook", (req, res) => {
 
     const verify_token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
 
-    // Parse params from the webhook verification request
+
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
     let challenge = req.query["hub.challenge"];
 
-    // Check if a token and mode were sent
+
     if (mode && token) {
-        // Check the mode and token sent are correct
+
         if (mode === "subscribe" && token === verify_token) {
-            // Respond with 200 OK and challenge token from the request
+
             console.log("WEBHOOK_VERIFIED");
             res.status(200).send(challenge);
         } else {
-            // Responds with '403 Forbidden' if verify tokens do not match
+
             res.sendStatus(403);
         }
     }
