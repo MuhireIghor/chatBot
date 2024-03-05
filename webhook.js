@@ -1,18 +1,10 @@
-/*
- * Starter Project for WhatsApp Echo Bot Tutorial
- *
- * Remix this as the starting point for following the WhatsApp Echo Bot tutorial
- *
- */
 
 "use strict";
-// req.body.entry[0].changes[0]
-// Access token for your app
-// (copy token from DevX getting started page
-// and save it as environment variable into the .env file)
-const token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
 
-// Imports dependencies and set up http server
+const token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
+let isCitySelected = false;
+let selectedCity=''
+
 const request = require("request"),
     express = require("express"),
     body_parser = require("body-parser"),
@@ -43,7 +35,20 @@ app.post("/webhook", async (req, res) => {
                 req.body.entry[0].changes[0].value.metadata.phone_number_id;
             let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
-            if (msg_body.type === 'text') {
+
+            if (msg_body.text.body.toString() == 'Hello' || 'Hi') {
+                axios({
+                    method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+                    url:
+                        "https://graph.facebook.com/v12.0/" +
+                        phone_number_id +
+                        "/messages?access_token=" +
+                        token,
+                    data: msg_body.text.body.toString(),
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+            else if (msg_body.type === 'text'&& isCitySelected == false) {
                 await sendCityInteractiveMessage(phone_number_id, token, from)
                 const responseBody = "Done";
                 response = {
@@ -52,7 +57,7 @@ app.post("/webhook", async (req, res) => {
                     isBase64Encoded: false,
                 };
             }
-            else if (msg_body.type === "interactive") {
+            else if (msg_body.type === "interactive" && isCitySelected) {
                 if (msg_body.interactive.type === 'list_reply') {
                     let messageinfo =
                         message.interactive.list_reply.id.split("_");
@@ -98,36 +103,9 @@ app.post("/webhook", async (req, res) => {
                     await sendReplyButtons(phone_number_id, token, from);
                     // for (const item of message.order.product_items) {
                     // }
-                  }
+                }
             }
 
-            // if (msg_body.toString().toLowerCase() == 'hello' || 'hi') {
-
-
-            //     axios({
-            //         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-            //         url:
-            //             "https://graph.facebook.com/v12.0/" +
-            //             phone_number_id +
-            //             "/messages?access_token=" +
-            //             token,
-            //         data: data,
-            //         headers: { "Content-Type": "application/json" },
-            //     });
-            // }
-            // else {
-
-            //     axios({
-            //         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-            //         url:
-            //             "https://graph.facebook.com/v12.0/" +
-            //             phone_number_id +
-            //             "/messages?access_token=" +
-            //             token,
-            //         data: data,
-            //         headers: { "Content-Type": "application/json" },
-            //     });
-            // }
         }
         res.sendStatus(200);
     } else {
@@ -136,13 +114,9 @@ app.post("/webhook", async (req, res) => {
     }
 });
 
-// Accepts GET requests at the /webhook endpoint. You need this URL to setup webhook initially.
-// info on verification request payload: https://developers.facebook.com/docs/graph-api/webhooks/getting-started#verification-requests 
+
 app.get("/webhook", (req, res) => {
-    /**
-     * UPDATE YOUR VERIFY TOKEN
-     *This will be the Verify Token value when you set up webhook
-    **/
+
     const verify_token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
 
     // Parse params from the webhook verification request
@@ -205,6 +179,7 @@ const sendCityInteractiveMessage = async (
     whatsapp_token,
     to
 ) => {
+    isCitySelected = true;
     try {
         let data = JSON.stringify({
             messaging_product: "whatsapp",
@@ -222,41 +197,33 @@ const sendCityInteractiveMessage = async (
                             title: "Choose a City",
                             rows: [
                                 {
-                                    id: "city_hyderabad",
+                                    id: `city_${city}_hyderabad`,
                                     title: "Hyderabad",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: "city_delhi",
+                                    id: `city_${city}_delhi`,
                                     title: "Delhi",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: "city_mumbai",
+                                    id: `city_${city}mumbai`,
                                     title: "Mumbai",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: "city_banglore",
+                                    id: `city_${city}_banglore`,
                                     title: "Banglore",
                                     //   description: "row-description-content-here",
                                 },
                                 {
-                                    id: "city_vizag",
+                                    id: `city_${city}_vizag`,
                                     title: "Vizag",
                                     //   description: "row-description-content-here",
                                 },
                             ],
                         },
-                        // {
-                        //   title: "your-section-title-content-here",
-                        //   rows: [
-                        //     {
-                        //       id: "unique-row-identifier-here",
-                        //       title: "row-title-content-here",
-                        //       description: "row-description-content-here",
-                        //     },
-                        //   ],
+
                         // },
                     ],
                 },
