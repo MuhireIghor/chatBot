@@ -42,25 +42,59 @@ app.post("/webhook", (req, res) => {
             let phone_number_id =
                 req.body.entry[0].changes[0].value.metadata.phone_number_id;
             let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
-            let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
+            let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body;
+            const data = JSON.stringify({
+                messaging_product: "whatsapp",
+                to: from,
+                type: "interactive",
+                interactive: {
+                    type: "list",
+                    body: {
+                        text: "Please select a category From the below Options",
+                    },
+                    action: {
+                        button: "Select Category",
+                        sections: [
+                            {
+                                title: "Choose a Category",
+                                rows: [
+                                    {
+                                        id: `cat_chains`,
+                                        title: "Chain",
+                                    },
+                                    {
+                                        id: `cat_necklace`,
+                                        title: "necklace",
+                                    },
+                                    {
+                                        id: `cat_bangles`,
+                                        title: "Bangles",
+                                    },
+                                    {
+                                        id: `cat_silver`,
+                                        title: "Silver Items",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                },
+            }); // extract the message text from the webhook payload
             if (msg_body.toString().toLowerCase() == 'hello' || 'hi') {
-                const buttons = [
-                    {
-                        title: "Get Started",
-                        type: "postback",
-                        payload: "START",
-                    },
-                    {
-                        title: "Learn More",
-                        type: "web_url",
-                        url: "https://igihe.com"
-                        
-                    },
-                ];
-                const quickReplies = {
-                    text: "Hi there! How can I help you?",
-                    quick_replies: buttons,
-                };
+
+             
+                axios({
+                    method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+                    url:
+                        "https://graph.facebook.com/v12.0/" +
+                        phone_number_id +
+                        "/messages?access_token=" +
+                        token,
+                    data: data,
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+            else {
 
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
@@ -69,27 +103,7 @@ app.post("/webhook", (req, res) => {
                         phone_number_id +
                         "/messages?access_token=" +
                         token,
-                    data: {
-                        messaging_product: "whatsapp",
-                        to: from,
-                        text: { body: quickReplies },
-                    },
-                    headers: { "Content-Type": "application/json" },
-                });
-            }
-            else {
-                axios({
-                    method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-                    url:
-                        "https://graph.facebook.com/v12.0/" +
-                        phone_number_id +
-                        "/messages?access_token=" +
-                        token,
-                    data: {
-                        messaging_product: "whatsapp",
-                        to: from,
-                        text: { body: "Welcome back to our chatbot" },
-                    },
+                    data:data,
                     headers: { "Content-Type": "application/json" },
                 });
             }
