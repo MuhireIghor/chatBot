@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon script.js"
+    "start": "nodemon script.js",
+    "dev": "nodemon --inspect script.js"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +19,8 @@
     "express": "^4.18.3",
     "mongoose": "^8.2.0",
     "whatsapp-web.js": "^1.23.0"
+  },
+  "engines": {
+    "node":"12.x"
   }
 }
