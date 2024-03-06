@@ -75,10 +75,16 @@ app.post("/webhook", async (req, res) => {
                         ,
                     },
                     headers: { "Content-Type": "application/json" },
+                }).then((res) => {
+                    console.log("Succesfully executed", res.data)
+                }).catch((err) => {
+                    console.log("Error occured on the initialisation part", err)
                 });
             }
             else if (msg_body.type === 'text' && isCitySelected == false) {
-                await sendCityInteractiveMessage(phone_number_id, token, from)
+                await sendCityInteractiveMessage(phone_number_id, token, from).catch((err) => {
+                    console.log(`err on the first part ${err.message}`)
+                })
                 const responseBody = "Done";
                 response = {
                     statusCode: 200,
@@ -95,15 +101,17 @@ app.post("/webhook", async (req, res) => {
                             phone_number_id,
                             token,
                             from,
-                            messageinfo[1]
+                            messageinfo[1] ?? 'Default'
                         );
                     } else if (messageinfo[0] === "cat") {
                         await sendReply(
                             phone_number_id,
                             token,
                             from,
-                            `${messageinfo[2]} and ${messageinfo[3]}`
-                        );
+                            `${messageinfo[2] ?? "Cat"} and ${messageinfo[3] ?? 'Default'}`
+                        ).catch((err) => {
+                            console.log("error on the second operation", err.message)
+                        });
                     }
                     const responseBody = "Done";
                     response = {
@@ -521,3 +529,45 @@ const sendReplyButtons = async (phone_number_id, whatsapp_token, to) => {
 
 
 
+
+const handleShowCatalog = async (phone_number, whatsap_token, to, option) => {
+    const products = [
+        { id: 1, title: "Product A", description: "This  is a product A" },
+        { id: 2, title: "Product b", description: "THis is product B" },
+        // ... other products
+    ];
+
+    try {
+        let data = JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: to,
+            type: "interactive",
+            interactive: {
+                type: "product_list",
+                header: {
+                    type: "text",
+                    text: "Our popular items in the store",
+
+                },
+                body: {
+                    text: "Click view catalog to order from the menu"
+                },
+                action: {
+                    catalog_id: "YOUR_CATALOG_ID", // Replace with your product catalog ID
+                    sections: [
+                        {
+                            title: "Products",
+                            product_items: products.map((product) => ({
+                                product_retailer_id: product.id
+                            }))
+                        }
+                    ]
+                }
+            }
+        })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
