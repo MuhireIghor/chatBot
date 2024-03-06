@@ -82,7 +82,7 @@ app.post("/webhook", async (req, res) => {
                 });
             }
             else if (msg_body.type === 'interactive' && msg_body.interactive.type === 'button_reply') {
-                await sendCityInteractiveMessage(phone_number_id, token, from).catch((err) => {
+                await sendCityInteractiveMessage(phone_number_id, token, from).then(res=>console.log(`Successfully completed operation 2 ${res.data} end`)).catch((err) => {
                     console.log(`err on the first part ${err.message}`)
                 })
                 const responseBody = "Done";
