@@ -81,7 +81,7 @@ app.post("/webhook", async (req, res) => {
                     console.log("Error occured on the initialisation part", err)
                 });
             }
-            else if (msg_body.type === 'text' && isCitySelected == false) {
+            else if (msg_body.type === 'interactive' && isCitySelected == false) {
                 await sendCityInteractiveMessage(phone_number_id, token, from).catch((err) => {
                     console.log(`err on the first part ${err.message}`)
                 })
@@ -101,14 +101,14 @@ app.post("/webhook", async (req, res) => {
                             phone_number_id,
                             token,
                             from,
-                            messageinfo[1] ?? 'Default'
+                            messageinfo[1]
                         );
                     } else if (messageinfo[0] === "cat") {
                         await sendReply(
                             phone_number_id,
                             token,
                             from,
-                            `${messageinfo[2] ?? "Cat"} and ${messageinfo[3] ?? 'Default'}`
+                            `${messageinfo[2]} and ${messageinfo[3]}`
                         ).catch((err) => {
                             console.log("error on the second operation", err.message)
                         });
