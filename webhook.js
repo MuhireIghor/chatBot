@@ -10,13 +10,15 @@ const express = require("express");
 const body_parser = require("body-parser");
 const axios = require("axios").default;
 const app = express().use(body_parser.json());
+const PORT = process.env.PORT || 1337;
 
 
-app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
+app.listen(PORT, () => console.log(`webhook is listening on port ${PORT}`));
 
 app.post("/webhook", async (req, res) => {
 
-    console.log(JSON.stringify(req.body, null, 2));
+    // console.log(JSON.stringify(req.body, null, 2));
+    // console.log(req.body.entry[0].changes)
 
 
     if (req.body.object) {
@@ -31,7 +33,12 @@ app.post("/webhook", async (req, res) => {
             let from = req.body.entry[0].changes[0].value.messages[0].from;
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
 
-            if (msg_body.type === "text" && msg_body.text.body.toString().toLowerCase() == 'hello' || 'hi') {
+            console.log({
+                phone_number_ids: req.body.entry.map(ent => ent.changes.map(change => change.value.metadata.phone_number_id).flat()).flat(),
+                messages: req.body.entry.map(ent => ent.changes.map(change => change.value.messages.map(msg => JSON.stringify(msg)).flat()).flat()).flat()
+            })
+
+            if (msg_body.type === "text" && ['hello', 'hi'].includes(msg_body.text.body.toString().toLowerCase())) {
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
                     url:
@@ -76,7 +83,9 @@ app.post("/webhook", async (req, res) => {
                     },
                     headers: { "Content-Type": "application/json" },
                 }).then((res) => {
-                    console.log("Succesfully executed", res.data)
+                    console.log("Succesfully executed", 
+                    // res.data
+                    )
                 }).catch((err) => {
                     console.log("Error occured on the initialisation part", err)
                 });
@@ -86,11 +95,11 @@ app.post("/webhook", async (req, res) => {
                     console.log(`err on the first part ${err.message}`)
                 })
                 const responseBody = "Done";
-                response = {
-                    statusCode: 200,
-                    body: JSON.stringify(responseBody),
-                    isBase64Encoded: false,
-                };
+                // response = {
+                //     statusCode: 200,
+                //     body: JSON.stringify(responseBody),
+                //     isBase64Encoded: false,
+                // };
             }
             else if (msg_body.type === "interactive" && isCitySelected) {
                 if (msg_body.interactive.type === 'list_reply') {
@@ -114,11 +123,11 @@ app.post("/webhook", async (req, res) => {
                         });
                     }
                     const responseBody = "Done";
-                    response = {
-                        statusCode: 200,
-                        body: JSON.stringify(responseBody),
-                        isBase64Encoded: false,
-                    }
+                    // response = {
+                    //     statusCode: 200,
+                    //     body: JSON.stringify(responseBody),
+                    //     isBase64Encoded: false,
+                    // }
                 }
             }
             else if (msg_body.type === "button_reply") {
@@ -154,15 +163,17 @@ app.post("/webhook", async (req, res) => {
 app.get("/webhook", (req, res) => {
 
     const verify_token = 'EAANOKbJLwIYBOZCOlGfW8QZAZBjEvr98iiFDL4DOnbglWG7ENeNVnvw64Uewsx5WlFEAi5YQ2WiZCXS6TRYHCBEjHmjnH5zZCOJeZAiVrPdbvnh2OmbBrAvP7ZBv3mgDy4EpO5pJxx8ye7ziMBDooej2CBEACCCrBimoJSBL3O3C6h7Seoy4ZCBeOL64RgAiKgW82KqazsRdYslJ3Kmj4wr5skTbYgwqZCtc6QZBJgS5IDoGqQ';
-
-
+    
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
     let challenge = req.query["hub.challenge"];
-
+    
+    
+        console.log({
+            mode,token,challenge
+        })
 
     if (mode && token) {
-
         if (mode === "subscribe" && token === verify_token) {
 
             console.log("WEBHOOK_VERIFIED");
