@@ -31,7 +31,7 @@ app.post("/webhook", async (req, res) => {
             let from = req.body.entry[0].changes[0].value.messages[0].from;
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
 
-            if (msg_body.text.body.toString().toLowerCase() == 'hello' || 'hi') {
+            if (msg_body.text.body && msg_body.text.body.toString().toLowerCase() == 'hello' || 'hi') {
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
                     url:
@@ -81,7 +81,7 @@ app.post("/webhook", async (req, res) => {
                     console.log("Error occured on the initialisation part", err)
                 });
             }
-            else if (msg_body.type === 'interactive' && isCitySelected == false) {
+            else if (msg_body.type === 'interactive' && msg_body.interactive.type === 'button_reply') {
                 await sendCityInteractiveMessage(phone_number_id, token, from).catch((err) => {
                     console.log(`err on the first part ${err.message}`)
                 })
