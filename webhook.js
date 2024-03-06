@@ -31,7 +31,7 @@ app.post("/webhook", async (req, res) => {
             let from = req.body.entry[0].changes[0].value.messages[0].from;
             let msg_body = req.body.entry[0].changes[0].value.messages[0]
 
-            if (msg_body.text.body && msg_body.text.body.toString().toLowerCase() == 'hello' || 'hi') {
+            if (msg_body.type === "text" && msg_body.text.body.toString().toLowerCase() == 'hello' || 'hi') {
                 axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
                     url:
