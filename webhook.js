@@ -1,7 +1,7 @@
 
 "use strict";
 
-const token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
+const token = 'EAANOKbJLwIYBOZCOlGfW8QZAZBjEvr98iiFDL4DOnbglWG7ENeNVnvw64Uewsx5WlFEAi5YQ2WiZCXS6TRYHCBEjHmjnH5zZCOJeZAiVrPdbvnh2OmbBrAvP7ZBv3mgDy4EpO5pJxx8ye7ziMBDooej2CBEACCCrBimoJSBL3O3C6h7Seoy4ZCBeOL64RgAiKgW82KqazsRdYslJ3Kmj4wr5skTbYgwqZCtc6QZBJgS5IDoGqQ';
 let isCitySelected = false;
 let selectedCity = ''
 
@@ -153,7 +153,7 @@ app.post("/webhook", async (req, res) => {
 
 app.get("/webhook", (req, res) => {
 
-    const verify_token = 'EAANOKbJLwIYBO8lplJZCtdcsr2TY4bs9I33WOoFcHhkjEt7P6f4NsN9OOJU9ZAPeDPCpzeRLIG1IsO3vXNaoZBfVkRHLL9WA1AXXBv2PCcEssAkMv3vbVB0r22tRfPW6B7jf6l4HQPjZAua7Y2KClYZAU1n84yasbGX9aWH7aJFWAAhpaPT7uZBqEG12gw6DkmDO4FBulnyMUosn8ts6oAj4XOmqlRrORZAXcFR3lJZArWIZD';
+    const verify_token = 'EAANOKbJLwIYBOZCOlGfW8QZAZBjEvr98iiFDL4DOnbglWG7ENeNVnvw64Uewsx5WlFEAi5YQ2WiZCXS6TRYHCBEjHmjnH5zZCOJeZAiVrPdbvnh2OmbBrAvP7ZBv3mgDy4EpO5pJxx8ye7ziMBDooej2CBEACCCrBimoJSBL3O3C6h7Seoy4ZCBeOL64RgAiKgW82KqazsRdYslJ3Kmj4wr5skTbYgwqZCtc6QZBJgS5IDoGqQ';
 
 
     let mode = req.query["hub.mode"];
