@@ -1,7 +1,7 @@
 
 "use strict";
 
-const token = 'EAANOKbJLwIYBOZCOlGfW8QZAZBjEvr98iiFDL4DOnbglWG7ENeNVnvw64Uewsx5WlFEAi5YQ2WiZCXS6TRYHCBEjHmjnH5zZCOJeZAiVrPdbvnh2OmbBrAvP7ZBv3mgDy4EpO5pJxx8ye7ziMBDooej2CBEACCCrBimoJSBL3O3C6h7Seoy4ZCBeOL64RgAiKgW82KqazsRdYslJ3Kmj4wr5skTbYgwqZCtc6QZBJgS5IDoGqQ';
+const token = 'EAANOKbJLwIYBO6IZAGfhn8UOUoF3dZAc8E1pZAumbVP8bQoYPrReVbPmvYUWWMJatNoJ9xZAW3Avm1pM6p8gaEO7AsfQULDYXIxuBUOi2skIXcUtbbeqZCkqFK8yuptyg0d042U7ruuZAIqOlZB0ZAZC1cMsykAZBRfEu0GblCzPMO4tnGf4DScqKEzhHO4EncGg3NtwFOG9nAOfUfFDzLht2PJj0NWMFZC12GAIvQk0SC4iiMZD';
 let isCitySelected = false;
 let selectedCity = ''
 
@@ -39,7 +39,7 @@ app.post("/webhook", async (req, res) => {
             })
 
             if (msg_body.type === "text" && ['hello', 'hi'].includes(msg_body.text.body.toString().toLowerCase())) {
-                axios({
+                await axios({
                     method: "POST", // Required, HTTP method, a string, e.g. POST, GET
                     url:
                         "https://graph.facebook.com/v12.0/" +
@@ -81,17 +81,17 @@ app.post("/webhook", async (req, res) => {
                         }
                         ,
                     },
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json" }
                 }).then((res) => {
-                    console.log("Succesfully executed", 
-                    // res.data
+                    console.log("Succesfully executed",
+                        // res.data
                     )
                 }).catch((err) => {
                     console.log("Error occured on the initialisation part", err)
                 });
             }
             else if (msg_body.type === 'interactive' && msg_body.interactive.type === 'button_reply') {
-                await sendCityInteractiveMessage(phone_number_id, token, from).then(res=>console.log(`Successfully completed operation 2 ${res.data} end`)).catch((err) => {
+                await sendCityInteractiveMessage(phone_number_id, token, from).then(res => console.log(`Successfully completed operation 2 ${res.data} end`)).catch((err) => {
                     console.log(`err on the first part ${err.message}`)
                 })
                 const responseBody = "Done";
@@ -113,14 +113,17 @@ app.post("/webhook", async (req, res) => {
                             messageinfo[1]
                         );
                     } else if (messageinfo[0] === "cat") {
-                        await sendReply(
-                            phone_number_id,
-                            token,
-                            from,
-                            `${messageinfo[2]} and ${messageinfo[3]}`
-                        ).catch((err) => {
-                            console.log("error on the second operation", err.message)
-                        });
+                        // sendReply(
+                        //     phone_number_id,
+                        //     token,
+                        //     from,
+                        //     `${messageinfo[2]} and ${messageinfo[3]}`
+                        // )
+                        await
+                            handleShowCatalog(phone_number_id, token, from)
+                                .catch((err) => {
+                                    console.log("error on the second operation", err.message)
+                                });
                     }
                     const responseBody = "Done";
                     // response = {
@@ -162,16 +165,16 @@ app.post("/webhook", async (req, res) => {
 
 app.get("/webhook", (req, res) => {
 
-    const verify_token = 'EAANOKbJLwIYBOZCOlGfW8QZAZBjEvr98iiFDL4DOnbglWG7ENeNVnvw64Uewsx5WlFEAi5YQ2WiZCXS6TRYHCBEjHmjnH5zZCOJeZAiVrPdbvnh2OmbBrAvP7ZBv3mgDy4EpO5pJxx8ye7ziMBDooej2CBEACCCrBimoJSBL3O3C6h7Seoy4ZCBeOL64RgAiKgW82KqazsRdYslJ3Kmj4wr5skTbYgwqZCtc6QZBJgS5IDoGqQ';
-    
+    const verify_token = 'EAANOKbJLwIYBO6IZAGfhn8UOUoF3dZAc8E1pZAumbVP8bQoYPrReVbPmvYUWWMJatNoJ9xZAW3Avm1pM6p8gaEO7AsfQULDYXIxuBUOi2skIXcUtbbeqZCkqFK8yuptyg0d042U7ruuZAIqOlZB0ZAZC1cMsykAZBRfEu0GblCzPMO4tnGf4DScqKEzhHO4EncGg3NtwFOG9nAOfUfFDzLht2PJj0NWMFZC12GAIvQk0SC4iiMZD';
+
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
     let challenge = req.query["hub.challenge"];
-    
-    
-        console.log({
-            mode,token,challenge
-        })
+
+
+    console.log({
+        mode, token, challenge
+    })
 
     if (mode && token) {
         if (mode === "subscribe" && token === verify_token) {
@@ -214,7 +217,7 @@ const sendReply = async (
             data: data,
         };
         const response = await axios.request(config);
-        console.log(response);
+        console.log("final part response", { ourResponse: response });
     } catch (err) {
         console.log(err);
     }
@@ -276,7 +279,9 @@ const sendCityInteractiveMessage = async (
                 },
             },
         });
-
+        console.log({
+            scd_data: JSON.parse(data)
+        })
         let config = {
             method: "post",
             maxBodyLength: Infinity,
@@ -290,7 +295,9 @@ const sendCityInteractiveMessage = async (
         const response = await axios.request(config);
         console.log("results on the operation", response);
     } catch (err) {
-        console.log(err);
+        console.log("error occured on the select city operation", {
+            error: err.message
+        });
     }
 };
 
@@ -430,7 +437,7 @@ const sendAddressDeliveryMessage = async (
                 action: {
                     name: "address_message",
                     parameters: {
-                        country: "IN",
+                        country: "US",
                     },
                 },
             },
@@ -449,7 +456,9 @@ const sendAddressDeliveryMessage = async (
         const response = await axios.request(config);
         console.log(response);
     } catch (err) {
-        console.log(JSON.stringify(err));
+        console.log("ERROR OCCURED IN DELIVERY MESSAGE", {
+            error: Object.keys(err.response.data)
+        });
     }
 };
 
@@ -541,7 +550,7 @@ const sendReplyButtons = async (phone_number_id, whatsapp_token, to) => {
 
 
 
-const handleShowCatalog = async (phone_number, whatsap_token, to, option) => {
+const handleShowCatalog = async (phone_number, whatsapp_token, to) => {
     const products = [
         { id: 1, title: "Product A", description: "This  is a product A" },
         { id: 2, title: "Product b", description: "THis is product B" },
@@ -577,8 +586,20 @@ const handleShowCatalog = async (phone_number, whatsap_token, to, option) => {
                 }
             }
         })
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `https://graph.facebook.com/v17.0/${phone_number}/messages`,
+            headers: {
+                Authorization: `Bearer ${whatsapp_token}`,
+                "Content-Type": "application/json",
+            },
+            data: data,
+        };
+        const response = await axios.request(config);
+        console.log(response);
     }
     catch (err) {
-        console.log(err)
+        console.log("error occured in the products section",err)
     }
 }
